@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ phone.name }} - Phone Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Images -->
+        <div class="col-md-5">
+            <div class="mb-3">
+                <img src="{{ phone.image.url }}" alt="{{ phone.name }}" class="img-fluid" id="mainImage" style="max-height: 400px;">
+            </div>
+            <div class="row">
+                {% if phone.image %}
+                <div class="col-3 mb-2">
+                    <img src="{{ phone.image.url }}" alt="" class="img-fluid cursor-pointer" onclick="document.getElementById('mainImage').src=this.src;">
+                </div>
+                {% endif %}
+                {% if phone.image2 %}
+                <div class="col-3 mb-2">
+                    <img src="{{ phone.image2.url }}" alt="" class="img-fluid cursor-pointer" onclick="document.getElementById('mainImage').src=this.src;">
+                </div>
+                {% endif %}
+                {% if phone.image3 %}
+                <div class="col-3 mb-2">
+                    <img src="{{ phone.image3.url }}" alt="" class="img-fluid cursor-pointer" onclick="document.getElementById('mainImage').src=this.src;">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Details -->
+        <div class="col-md-7">
+            <h1>{{ phone.name }}</h1>
+            
+            <div class="mb-3">
+                <span class="badge bg-info">{{ phone.category.name }}</span>
+                <span class="badge bg-secondary">{{ phone.condition }}</span>
+            </div>
+
+            <!-- Rating -->
+            {% if phone.rating %}
+            <div class="mb-3">
+                <div class="product-rating">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= phone.rating %}
+                        ⭐
+                        {% else %}
+                        ☆
+                        {% endif %}
+                    {% endfor %}
+                    {{ phone.rating }} / 5 ({{ phone.review_count }} đánh giá)
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Price -->
+            <div class="mb-3">
+                {% if phone.discount_price %}
+                    <div>
+                        <span class="h3" style="color: var(--danger-color);">{{ phone.discount_price|floatformat:0 }}₫</span>
+                        <span class="text-muted text-decoration-line-through">{{ phone.price|floatformat:0 }}₫</span>
+                        <span class="badge bg-danger">-{{ phone.get_discount_percentage }}%</span>
+                    </div>
+                {% else %}
+                    <div class="h3" style="color: var(--danger-color);">{{ phone.price|floatformat:0 }}₫</div>
+                {% endif %}
+            </div>
+
+            <!-- Stock -->
+            <div class="mb-3">
+                {% if phone.stock > 0 %}
+                    <span class="badge bg-success" style="font-size: 14px;">✓ Còn {{ phone.stock }} sản phẩm</span>
+                {% else %}
+                    <span class="badge bg-danger" style="font-size: 14px;">✗ Hết hàng</span>
+                {% endif %}
+            </div>
+
+            <!-- Specifications -->
+            <div class="specification-section mb-4">
+                <h4>Thông số kỹ thuật</h4>
+                <table class="table table-sm">
+                    {% if phone.cpu %}<tr><td>CPU:</td><td>{{ phone.cpu }}</td></tr>{% endif %}
+                    {% if phone.ram %}<tr><td>RAM:</td><td>{{ phone.ram }}</td></tr>{% endif %}
+                    {% if phone.storage %}<tr><td>Bộ nhớ:</td><td>{{ phone.storage }}</td></tr>{% endif %}
+                    {% if phone.display %}<tr><td>Màn hình:</td><td>{{ phone.display }}</td></tr>{% endif %}
+                    {% if phone.camera %}<tr><td>Camera:</td><td>{{ phone.camera }}</td></tr>{% endif %}
+                    {% if phone.battery %}<tr><td>Pin:</td><td>{{ phone.battery }}</td></tr>{% endif %}
+                    {% if phone.os %}<tr><td>Hệ điều hành:</td><td>{{ phone.os }}</td></tr>{% endif %}
+                </table>
+            </div>
+
+            <!-- Add to cart -->
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'store:add_to_cart' %}" class="mb-3">
+                {% csrf_token %}
+                <input type="hidden" name="phone_id" value="{{ phone.id }}">
+                <div class="input-group mb-3">
+                    <input type="number" name="quantity" class="form-control" value="1" min="1" max="{{ phone.stock }}" style="max-width: 100px;">
+                    <button class="btn btn-primary" type="submit" {% if phone.stock == 0 %}disabled{% endif %}>
+                        🛒 Thêm vào giỏ hàng
+                    </button>
+                </div>
+            </form>
+
+            <button onclick="addToWishlist({{ phone.id }})" class="btn btn-outline-primary me-2">
+                ❤️ Thêm vào danh sách yêu thích
+            </button>
+            <a href="{% url 'store:product_list' %}" class="btn btn-secondary">← Quay lại</a>
+            {% else %}
+            <div class="alert alert-info">
+                <p>Vui lòng <a href="{% url 'store:login' %}">đăng nhập</a> để mua hàng</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3>Mô tả sản phẩm</h3>
+            <p>{{ phone.description }}</p>
+        </div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3>Đánh giá từ khách hàng</h3>
+            
+            {% if user.is_authenticated %}
+            {% if not has_reviewed %}
+            <div class="mb-4 p-3 bg-light rounded">
+                <h5>Viết đánh giá của bạn</h5>
+                <form method="post" action="{% url 'store:add_review' phone.slug %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Đánh giá:</label>
+                        <div>
+                            {% for value, label in review_form.rating.field.choices %}
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="rating" id="id_rating_{{ value }}" value="{{ value }}" required>
+                                <label class="form-check-label" for="id_rating_{{ value }}">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= value %}⭐{% else %}☆{% endif %}
+                                    {% endfor %}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_comment" class="form-label">Nhận xét:</label>
+                        <textarea name="comment" id="id_comment" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+                </form>
+            </div>
+            {% endif %}
+            {% endif %}
+
+            {% if reviews %}
+            <div class="reviews-list">
+                {% for review in reviews %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}⭐{% else %}☆{% endif %}
+                            {% endfor %}
+                            {{ review.user.first_name|default:review.user.username }}
+                        </h5>
+                        <p class="card-text">{{ review.comment }}</p>
+                        <small class="text-muted">{{ review.created_at|date:"d/m/Y" }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">Chưa có đánh giá nào</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_phones %}
+    <div class="row mt-5 mb-5">
+        <div class="col-md-12">
+            <h3>Sản phẩm liên quan</h3>
+            <div class="products-container">
+                {% for related_phone in related_phones %}
+                <div class="product-card">
+                    <a href="{% url 'store:product_detail' related_phone.slug %}">
+                        <img src="{{ related_phone.image.url }}" alt="{{ related_phone.name }}" class="product-image">
+                    </a>
+                    <div class="product-info">
+                        <div class="product-brand">{{ related_phone.brand }}</div>
+                        <a href="{% url 'store:product_detail' related_phone.slug %}" class="product-name">{{ related_phone.name }}</a>
+                        <div class="product-price">{{ related_phone.get_price_display|floatformat:0 }}₫</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function addToWishlist(phoneId) {
+    fetch(`/wishlist/add/${phoneId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value || '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}

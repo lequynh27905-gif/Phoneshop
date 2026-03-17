@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - Phone Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">{{ category.name }}</h1>
+    
+    {% if category.description %}
+    <p class="text-muted mb-4">{{ category.description }}</p>
+    {% endif %}
+
+    {% if phones %}
+    <div class="products-container">
+        {% for phone in phones %}
+        <div class="product-card">
+            <a href="{% url 'store:product_detail' phone.slug %}">
+                <img src="{{ phone.image.url }}" alt="{{ phone.name }}" class="product-image">
+            </a>
+            <div class="product-info">
+                <div class="product-brand">{{ phone.brand }}</div>
+                <a href="{% url 'store:product_detail' phone.slug %}" class="product-name">{{ phone.name }}</a>
+                
+                {% if phone.discount_price %}
+                <div>
+                    <span class="original-price">{{ phone.price|floatformat:0 }}₫</span>
+                    <span class="discount-badge">-{{ phone.get_discount_percentage }}%</span>
+                </div>
+                {% endif %}
+                
+                <div class="product-price">{{ phone.get_price_display|floatformat:0 }}₫</div>
+                
+                {% if phone.rating %}
+                <div class="product-rating">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= phone.rating %}
+                        ⭐
+                        {% else %}
+                        ☆
+                        {% endif %}
+                    {% endfor %}
+                    ({{ phone.review_count }})
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p class="text-center">Danh mục này chưa có sản phẩm nào.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

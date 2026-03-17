@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Đăng ký - Phone Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Đăng ký tài khoản</h2>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Tên đăng nhập</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_first_name" class="form-label">Họ tên</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password1" class="form-label">Mật khẩu</label>
+                            {{ form.password1 }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password2" class="form-label">Xác nhận mật khẩu</label>
+                            {{ form.password2 }}
+                        </div>
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for field, error in form.errors.items %}
+                            <p>{{ field }}: {{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
+                    </form>
+
+                    <hr>
+
+                    <p class="text-center">
+                        Đã có tài khoản? <a href="{% url 'store:login' %}">Đăng nhập ngay</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

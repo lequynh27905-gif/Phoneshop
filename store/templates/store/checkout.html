@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Thanh toán - Phone Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">💳 Thanh toán</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h3>Thông tin giao hàng</h3>
+            <form method="post" class="mb-4">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.full_name }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.email }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.phone }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.city }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    {{ form.address }}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.postal_code }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_payment_method" class="form-label">Phương thức thanh toán</label>
+                    {{ form.payment_method }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_notes" class="form-label">Ghi chú đơn hàng</label>
+                    {{ form.notes }}
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg">✓ Xác nhận đơn hàng</button>
+            </form>
+        </div>
+
+        <div class="col-md-4">
+            <h3>Chi tiết đơn hàng</h3>
+            <div class="cart-summary">
+                <h5>Sản phẩm:</h5>
+                {% for item in cart_items %}
+                <div class="summary-row">
+                    <span>{{ item.phone.name }} x{{ item.quantity }}</span>
+                    <span>{{ item.get_total_price|floatformat:0 }}₫</span>
+                </div>
+                {% endfor %}
+
+                <hr class="my-3">
+
+                <div class="summary-row">
+                    <span>Tạm tính:</span>
+                    <span>{{ subtotal|floatformat:0 }}₫</span>
+                </div>
+                <div class="summary-row">
+                    <span>Phí vận chuyển:</span>
+                    <span>{{ shipping_cost|floatformat:0 }}₫</span>
+                </div>
+                <div class="summary-row">
+                    <span>Thuế (10%):</span>
+                    <span>{{ tax|floatformat:0 }}₫</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Tổng cộng:</span>
+                    <span>{{ total|floatformat:0 }}₫</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

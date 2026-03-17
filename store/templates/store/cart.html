@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Giỏ hàng - Phone Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">🛒 Giỏ hàng của bạn</h1>
+
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-md-8">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Tổng tiền</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'store:product_detail' item.phone.slug %}">{{ item.phone.name }}</a>
+                        </td>
+                        <td>{{ item.phone.get_price_display|floatformat:0 }}₫</td>
+                        <td>
+                            <form method="post" action="{% url 'store:update_cart_quantity' item.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" class="quantity-input form-control" value="{{ item.quantity }}" min="1" max="{{ item.phone.stock }}">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Cập nhật</button>
+                            </form>
+                        </td>
+                        <td>{{ item.get_total_price|floatformat:0 }}₫</td>
+                        <td>
+                            <a href="{% url 'store:remove_from_cart' item.id %}" class="btn btn-sm btn-danger">Xóa</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-4">
+            <div class="cart-summary">
+                <h4 class="mb-3">Tóm tắt đơn hàng</h4>
+                <div class="summary-row">
+                    <span>Tạm tính:</span>
+                    <span>{{ total_price|floatformat:0 }}₫</span>
+                </div>
+                <div class="summary-row">
+                    <span>Phí vận chuyển:</span>
+                    <span>50,000₫</span>
+                </div>
+                <div class="summary-row">
+                    <span>Thuế (10%):</span>
+                    <span>{{ total_price|add:'50000'|mul:'0.1'|floatformat:0 }}₫</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Tổng cộng:</span>
+                    <span>{{ total_price|add:'50000'|mul:'0.1'|add:total_price|add:'50000'|floatformat:0 }}₫</span>
+                </div>
+                <a href="{% url 'store:checkout' %}" class="btn btn-success btn-block mt-3" style="width: 100%; display: block;">
+                    Tiến hành thanh toán
+                </a>
+                <a href="{% url 'store:product_list' %}" class="btn btn-secondary btn-block mt-2" style="width: 100%; display: block;">
+                    Tiếp tục mua sắm
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-8">
+            <a href="{% url 'store:clear_cart' %}" class="btn btn-outline-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa toàn bộ giỏ hàng?');">
+                Xóa giỏ hàng
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">Giỏ hàng trống!</h4>
+        <p>Bạn chưa có sản phẩm nào trong giỏ hàng. <a href="{% url 'store:product_list' %}">Hãy mua sắm ngay</a></p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

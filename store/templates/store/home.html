@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+
+{% block title %}Trang chủ - Phone Shop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .special-offer-banner {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 40px 0;
+        animation: slideInLeft 0.6s ease-out;
+    }
+    
+    .special-offer-banner h3 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .special-offer-banner .discount-value {
+        font-size: 48px;
+        font-weight: bold;
+        color: var(--warning-color);
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+    
+    .category-card {
+        background: linear-gradient(135deg, var(--dark-bg-secondary), var(--dark-bg-tertiary));
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        padding: 24px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: var(--text-light);
+        animation: fadeInUp 0.5s ease-out;
+    }
+    
+    .category-card:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(111, 66, 193, 0.3);
+    }
+    
+    .category-card i {
+        font-size: 32px;
+        color: var(--accent-color);
+        margin-bottom: 12px;
+    }
+    
+    .category-card h4 {
+        margin: 12px 0 8px;
+        color: var(--accent-color);
+        font-weight: bold;
+    }
+    
+    .category-card .count {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .section-header h2 {
+        margin: 0;
+        font-size: 28px;
+        color: var(--accent-color);
+    }
+    
+    .section-header i {
+        font-size: 28px;
+        color: var(--primary-color);
+    }
+    
+    .view-all-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .view-all-link:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(111, 66, 193, 0.4);
+    }
+    
+    .product-cards-section {
+        margin: 50px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 style="font-size: 44px; font-weight: bold; margin-bottom: 20px; color: var(--accent-color);">
+                    <i class="fas fa-mobile-alt"></i> Chào mừng đến PhoneShop
+                </h1>
+                <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.6;">
+                    Cửa hàng điện thoại uy tín, chuyên cung cấp những chiếc điện thoại chính hãng tốt nhất từ các thương hiệu nổi tiếng trên thế giới. 
+                    Chúng tôi cam k承 tuân thủ 100% hàng chính hãng với bảo hành trọn vẹn.
+                </p>
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border: none;">
+                    <i class="fas fa-shopping-bag"></i> Mua hàng ngay
+                </a>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-star" style="font-size: 120px; color: var(--warning-color); opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Special Offer Banner -->
+    <div class="special-offer-banner">
+        <h3><i class="fas fa-fire"></i> KHUYẾN MÃI ĐẶC BIỆT</h3>
+        <p style="font-size: 14px; margin-bottom: 12px;">Mua hàng trong tuần này, nhận</p>
+        <div class="discount-value">Giảm đến 30%</div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="product-cards-section">
+        <div class="section-header">
+            <i class="fas fa-th"></i>
+            <h2>Danh mục sản phẩm</h2>
+        </div>
+        <div class="category-grid">
+            {% for category in categories %}
+            <a href="{% url 'store:category_list' category.slug %}" class="category-card">
+                {% if "Apple" in category.name %}
+                    <i class="fab fa-apple"></i>
+                {% elif "Samsung" in category.name %}
+                    <i class="fas fa-mobile-alt" style="color: var(--accent-color);"></i>
+                {% elif "Xiaomi" in category.name %}
+                    <i class="fas fa-mobile-alt" style="color: var(--accent-color);"></i>
+                {% else %}
+                    <i class="fas fa-mobile-alt"></i>
+                {% endif %}
+                <h4>{{ category.name }}</h4>
+                <span class="count">{{ category.phones.count }} sản phẩm</span>
+            </a>
+            {% empty %}
+            <p class="text-center">Không có danh mục nào</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Featured Products Section -->
+    <div class="product-cards-section">
+        <div class="section-header">
+            <i class="fas fa-crown"></i>
+            <h2>Sản phẩm nổi bật</h2>
+        </div>
+        <div class="products-container">
+            {% for phone in featured_phones %}
+            <div class="product-card" style="animation: fadeInUp 0.5s ease-out; animation-fill-mode: both;">
+                <div style="animation-delay: {{ forloop.counter|add:0.1 }}s;">
+                    <a href="{% url 'store:product_detail' phone.slug %}">
+                        {% if phone.image %}
+                        <img src="{{ phone.image.url }}" alt="{{ phone.name }}" class="product-image">
+                        {% else %}
+                        <div class="product-image" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                            <i class="fas fa-mobile-alt" style="color: white;"></i>
+                        </div>
+                        {% endif %}
+                    </a>
+                    <div class="product-info">
+                        <div class="product-brand">
+                            <i class="fas fa-tag"></i> {{ phone.brand }}
+                        </div>
+                        <a href="{% url 'store:product_detail' phone.slug %}" class="product-name">{{ phone.name }}</a>
+                        
+                        {% if phone.discount_price %}
+                        <div style="margin: 10px 0;">
+                            <span class="original-price"><s>{{ phone.price|floatformat:0 }}₫</s></span>
+                            <span class="discount-badge">-{{ phone.get_discount_percentage }}%</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="product-price" style="font-size: 18px; font-weight: bold; color: var(--warning-color); margin: 10px 0;">
+                            {{ phone.get_price_display|floatformat:0 }}₫
+                        </div>
+                        
+                        {% if phone.rating %}
+                        <div class="product-rating">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= phone.rating %}
+                                <i class="fas fa-star" style="color: var(--warning-color);"></i>
+                                {% else %}
+                                <i class="far fa-star" style="color: var(--border-color);"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span style="margin-left: 8px; font-size: 12px; color: var(--text-muted);">({{ phone.review_count }} đánh giá)</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="product-stock" style="margin-top: 12px;">
+                            {% if phone.stock > 0 %}
+                            <span style="color: var(--success-color);">
+                                <i class="fas fa-check-circle"></i> Còn hàng ({{ phone.stock }})
+                            </span>
+                            {% else %}
+                            <span style="color: var(--danger-color);">
+                                <i class="fas fa-times-circle"></i> Hết hàng
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">Không có sản phẩm nào</p>
+            {% endfor %}
+        </div>
+        <a href="{% url 'store:product_list' %}?sort=rating" class="view-all-link">
+            <i class="fas fa-arrow-right"></i> Xem tất cả sản phẩm nổi bật
+        </a>
+    </div>
+
+    <!-- New Products Section -->
+    <div class="product-cards-section">
+        <div class="section-header">
+            <i class="fas fa-fire"></i>
+            <h2>Sản phẩm mới nhất</h2>
+        </div>
+        <div class="products-container">
+            {% for phone in new_phones %}
+            <div class="product-card" style="animation: slideInLeft 0.5s ease-out; animation-fill-mode: both;">
+                <div style="animation-delay: {{ forloop.counter|add:0.1 }}s;">
+                    <a href="{% url 'store:product_detail' phone.slug %}">
+                        {% if phone.image %}
+                        <img src="{{ phone.image.url }}" alt="{{ phone.name }}" class="product-image">
+                        {% else %}
+                        <div class="product-image" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                            <i class="fas fa-mobile-alt" style="color: white;"></i>
+                        </div>
+                        {% endif %}
+                    </a>
+                    <div class="product-info">
+                        <div class="product-brand">
+                            <i class="fas fa-tag"></i> {{ phone.brand }}
+                        </div>
+                        <a href="{% url 'store:product_detail' phone.slug %}" class="product-name">{{ phone.name }}</a>
+                        
+                        {% if phone.discount_price %}
+                        <div style="margin: 10px 0;">
+                            <span class="original-price"><s>{{ phone.price|floatformat:0 }}₫</s></span>
+                            <span class="discount-badge">-{{ phone.get_discount_percentage }}%</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="product-price" style="font-size: 18px; font-weight: bold; color: var(--warning-color); margin: 10px 0;">
+                            {{ phone.get_price_display|floatformat:0 }}₫
+                        </div>
+                        
+                        {% if phone.rating %}
+                        <div class="product-rating">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= phone.rating %}
+                                <i class="fas fa-star" style="color: var(--warning-color);"></i>
+                                {% else %}
+                                <i class="far fa-star" style="color: var(--border-color);"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span style="margin-left: 8px; font-size: 12px; color: var(--text-muted);">({{ phone.review_count }} đánh giá)</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">Không có sản phẩm nào</p>
+            {% endfor %}
+        </div>
+        <a href="{% url 'store:product_list' %}" class="view-all-link">
+            <i class="fas fa-arrow-right"></i> Xem tất cả sản phẩm mới
+        </a>
+    </div>
+
+    <!-- Why Choose Us Section -->
+    <div class="row my-5 py-5" style="background: linear-gradient(135deg, var(--dark-bg-secondary), var(--dark-bg-tertiary)); border-radius: 12px; padding: 40px !important;">
+        <h2 class="text-center mb-5" style="color: var(--accent-color); font-weight: bold;">
+            <i class="fas fa-check-double"></i> Tại sao chọn PhoneShop?
+        </h2>
+        
+        <div class="col-md-3 text-center mb-4">
+            <i class="fas fa-shield-alt" style="font-size: 40px; color: var(--primary-color); margin-bottom: 12px;"></i>
+            <h4 style="color: var(--accent-color); margin-bottom: 10px;">100% Chính hãng</h4>
+            <p style="color: var(--text-muted);">Tất cả sản phẩm đều được xác thực và bảo hành chính hãng</p>
+        </div>
+        
+        <div class="col-md-3 text-center mb-4">
+            <i class="fas fa-shipping-fast" style="font-size: 40px; color: var(--success-color); margin-bottom: 12px;"></i>
+            <h4 style="color: var(--accent-color); margin-bottom: 10px;">Giao hàng nhanh</h4>
+            <p style="color: var(--text-muted);">Giao hàng trong vòng 24-48 giờ tại TP.HCM</p>
+        </div>
+        
+        <div class="col-md-3 text-center mb-4">
+            <i class="fas fa-headset" style="font-size: 40px; color: var(--accent-color); margin-bottom: 12px;"></i>
+            <h4 style="color: var(--accent-color); margin-bottom: 10px;">Hỗ trợ 24/7</h4>
+            <p style="color: var(--text-muted);">Đội ngũ hỗ trợ khách hàng luôn sẵn sàng giúp đỡ</p>
+        </div>
+        
+        <div class="col-md-3 text-center mb-4">
+            <i class="fas fa-undo" style="font-size: 40px; color: var(--warning-color); margin-bottom: 12px;"></i>
+            <h4 style="color: var(--accent-color); margin-bottom: 10px;">Đổi trả dễ</h4>
+            <p style="color: var(--text-muted);">Đổi trả miễn phí trong 30 ngày nếu không hài lòng</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add animation delay to product cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const productCards = document.querySelectorAll('.product-card > div');
+        productCards.forEach((card, index) => {
+            card.parentElement.style.animationDelay = (index * 0.1) + 's';
+        });
+    });
+</script>
+{% endblock %}

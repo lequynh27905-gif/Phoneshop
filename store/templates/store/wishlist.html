@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Danh sách yêu thích - Phone Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">❤️ Danh sách yêu thích của bạn</h1>
+
+    {% if phones %}
+    <div class="products-container">
+        {% for phone in phones %}
+        <div class="product-card">
+            <a href="{% url 'store:product_detail' phone.slug %}">
+                <img src="{{ phone.image.url }}" alt="{{ phone.name }}" class="product-image">
+            </a>
+            <div class="product-info">
+                <div class="product-brand">{{ phone.brand }}</div>
+                <a href="{% url 'store:product_detail' phone.slug %}" class="product-name">{{ phone.name }}</a>
+                
+                {% if phone.discount_price %}
+                <div>
+                    <span class="original-price">{{ phone.price|floatformat:0 }}₫</span>
+                    <span class="discount-badge">-{{ phone.get_discount_percentage }}%</span>
+                </div>
+                {% endif %}
+                
+                <div class="product-price">{{ phone.get_price_display|floatformat:0 }}₫</div>
+                
+                <div style="display: flex; gap: 5px;">
+                    <a href="{% url 'store:product_detail' phone.slug %}" class="btn btn-sm btn-primary" style="flex: 1;">
+                        Xem chi tiết
+                    </a>
+                    <a href="{% url 'store:remove_from_wishlist' phone.id %}" class="btn btn-sm btn-danger" style="flex: 1;">
+                        Xóa
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p>Danh sách yêu thích của bạn trống. <a href="{% url 'store:product_list' %}">Tìm sản phẩm yêu thích</a></p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

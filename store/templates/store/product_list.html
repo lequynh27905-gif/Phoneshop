@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Danh sách sản phẩm - Phone Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">📱 Danh sách sản phẩm</h1>
+    
+    <!-- Search & Filter -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form method="get" class="search-form">
+                <input type="text" name="q" class="form-control" placeholder="Tìm kiếm..." value="{{ query }}">
+                <select name="category" class="form-control">
+                    <option value="">-- Tất cả danh mục --</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if request.GET.category|add:"0" == category.id %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="min_price" class="form-control" placeholder="Giá tối thiểu" step="1000">
+                <input type="number" name="max_price" class="form-control" placeholder="Giá tối đa" step="1000">
+                <select name="sort" class="form-control">
+                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Mới nhất</option>
+                    <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Giá thấp → cao</option>
+                    <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Giá cao → thấp</option>
+                    <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Được yêu thích</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <h4>Danh mục</h4>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <a href="{% url 'store:product_list' %}">Tất cả sản phẩm</a>
+                </li>
+                {% for category in categories %}
+                <li class="list-group-item">
+                    <a href="{% url 'store:category_list' category.slug %}">{{ category.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-md-9">
+            {% if phones %}
+            <div class="products-container">
+                {% for phone in phones %}
+                <div class="product-card">
+                    <a href="{% url 'store:product_detail' phone.slug %}">
+                        <img src="{{ phone.image.url }}" alt="{{ phone.name }}" class="product-image">
+                    </a>
+                    <div class="product-info">
+                        <div class="product-brand">{{ phone.brand }}</div>
+                        <a href="{% url 'store:product_detail' phone.slug %}" class="product-name">{{ phone.name }}</a>
+                        
+                        {% if phone.discount_price %}
+                        <div>
+                            <span class="original-price">{{ phone.price|floatformat:0 }}₫</span>
+                            <span class="discount-badge">-{{ phone.get_discount_percentage }}%</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="product-price">{{ phone.get_price_display|floatformat:0 }}₫</div>
+                        
+                        {% if phone.rating %}
+                        <div class="product-rating">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= phone.rating %}
+                                ⭐
+                                {% else %}
+                                ☆
+                                {% endif %}
+                            {% endfor %}
+                            ({{ phone.review_count }})
+                        </div>
+                        {% endif %}
+                        
+                        <div class="product-stock">
+                            {% if phone.stock > 0 %}
+                            <span style="color: green;">✓ Còn hàng</span>
+                            {% else %}
+                            <span style="color: red;">✗ Hết hàng</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <p class="text-center">Không tìm thấy sản phẩm nào phù hợp với tiêu chí tìm kiếm.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
